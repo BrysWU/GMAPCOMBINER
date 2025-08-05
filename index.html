@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0MSVMGYC4C"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-0MSVMGYC4C');
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="images/x-icon" href="favicon.ico" />
+    <title>Google Maps Route Combiner</title>
+    <style>
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fad0c4, #fbc2eb, #a18cd1, #fbc2eb, #fad0c4);
+            background-size: 400% 400%;
+            animation: gradientAnimation 10s ease infinite;
+            color: #333333;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            color: white; /* Adjust text color as needed */
+            text-align: center;
+            font-size: 10px;
+            opacity: 0.5;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.5);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            transition: background-color 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], textarea {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #cccccc;
+            border-radius: 10px;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .dark-mode body {
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+        }
+
+        .dark-mode .container {
+            background-color: rgba(51, 51, 51, 0.5);
+            color: #f0f0f0;
+            backdrop-filter: blur(10px);
+        }
+
+        .dark-mode input[type="text"], .dark-mode textarea {
+            background-color: #444444;
+            color: #f0f0f0;
+            border-color: #555555;
+        }
+
+        .dark-mode button {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        .dark-mode button:hover {
+            background-color: #0056b3;
+        }
+
+        .dark-mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            font-size: 24px;
+            transition: color 0.3s;
+        }
+        textarea#output {
+            min-width: 552px;
+            max-width: 552px;
+            min-height: 82px;
+            max-height: 380px;
+        }
+        ::placeholder {
+            text-align: center; 
+        }
+    </style>
+</head>
+<body>
+    <div class="dark-mode-toggle" onclick="toggleDarkMode()">
+        🌙
+    </div>
+    <div class="container">
+        <h1>Google Maps Route Combiner</h1>
+        <p>Enter Two Google Maps URLs</p>
+        <input type="text" id="url1" placeholder="First Google Maps URL"><br>
+        <input type="text" id="url2" placeholder="Second Google Maps URL"><br>
+        <button onclick="combineRoutes()">Combine Routes</button>
+        <p>Combined URL:</p>
+        <textarea id="output" rows="4" readonly></textarea>
+        <button onclick="copyToClipboard()">Copy URL</button>
+    </div>
+
+    <footer>
+        <p>WeCodin.free.nf does not host any pirated/copyright content on its servers, Google Maps that you download or use, are directly downloaded from their respective CDN servers/Google maps / Google servers.</p>
+        <p>And this product is not associated with Google.</p>
+        <p><a href="/">WeCodin.free.nf</a> &copy; 2024. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function extractStops(url) {
+            const regex = /\/([^\/@]+),/g;
+            let stops = [];
+            let match;
+            while ((match = regex.exec(url)) !== null) {
+                stops.push(decodeURIComponent(match[1]));
+            }
+            return stops;
+        }
+
+        function combineRoutes() {
+            const url1 = document.getElementById("url1").value;
+            const url2 = document.getElementById("url2").value;
+
+            if (!url1 || !url2) {
+                alert("Please enter both URLs.");
+                return;
+            }
+
+            const stops1 = extractStops(url1);
+            const stops2 = extractStops(url2);
+
+            const allStops = [...new Set(stops1.concat(stops2))];
+
+            if (allStops.length === 0) {
+                document.getElementById("output").value = "Unable to extract stops from the provided URLs.\nAre you using the Correct URLs?\nPlease do Not Use Share URLs, Only URLs from the Address Bar!";
+                return;
+            }
+
+            const baseUrl = "https://www.google.com/maps/dir/";
+            const combinedUrl = baseUrl + allStops.join("/") + "/";
+
+            document.getElementById("output").value = combinedUrl;
+        }
+
+        function copyToClipboard() {
+            const output = document.getElementById("output");
+            output.select();
+            output.setSelectionRange(0, 99999); // For mobile devices
+            document.execCommand("copy");
+            alert("Combined URL copied to clipboard!");
+        }
+
+        function setCookie(name, value, days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            const expires = "expires=" + date.toUTCString();
+            document.cookie = name + "=" + value + ";" + expires + ";path=/";
+        }
+
+        function getCookie(name) {
+            const decodedCookie = decodeURIComponent(document.cookie);
+            const cookieArray = decodedCookie.split(';');
+            for (let i = 0; i < cookieArray.length; i++) {
+                let cookie = cookieArray[i].trim();
+                if (cookie.indexOf(name + "=") === 0) {
+                    return cookie.substring(name.length + 1);
+                }
+            }
+            return "";
+        }
+
+        function toggleDarkMode() {
+            const isDarkMode = document.body.classList.toggle("dark-mode");
+            setCookie("darkMode", isDarkMode, 30);
+
+            const icon = document.querySelector(".dark-mode-toggle");
+            icon.textContent = isDarkMode ? "🌞" : "🌙";
+        }
+
+        function loadDarkModeSetting() {
+            const darkModeSetting = getCookie("darkMode");
+            if (darkModeSetting === "true") {
+                document.body.classList.add("dark-mode");
+                document.querySelector(".dark-mode-toggle").textContent = "🌞";
+            } else {
+                document.querySelector(".dark-mode-toggle").textContent = "🌙";
+            }
+        }
+
+        window.onload = loadDarkModeSetting;
+    </script>
+</body>
+</html>
